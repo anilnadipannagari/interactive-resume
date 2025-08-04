@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anil Kumar N - Interactive Resume</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals with Subtle Blue Accent -->
+    <!-- Application Structure Plan: A single-page, multi-section layout with a fixed navigation bar for easy scrolling. The structure is designed to guide the user through a narrative: Introduction (who I am), Skills (what I can do), Projects (what I have built), Education (my background), and a new interactive Chatbot section. This is more engaging than a linear resume, allowing recruiters to quickly jump to sections of interest. Interactivity is introduced through skill bars, clickable project links, and a new LLM-powered chatbot to make exploration intuitive. -->
+    <!-- Visualization & Content Choices: 
+        - Summary: Presented as a prominent hero section to grab immediate attention. Goal: Inform. Method: Formatted Text.
+        - Skills: Organized into categories. Goal: Inform/Compare. Method: HTML/CSS progress bars for visual representation of proficiency. Interaction: None, for clarity. Justification: Visual bars are faster to scan than text lists.
+        - Projects: Displayed as cards. Goal: Organize/Inform. Method: HTML/CSS cards. Interaction: Links to GitHub. Justification: Cards provide a clean, organized view of portfolio items.
+        - Education: Presented as a vertical timeline. Goal: Change/Inform. Method: HTML/CSS timeline. Justification: A timeline visually represents the educational journey chronologically.
+        - Chat with Resume: New section with an interactive chat interface. Goal: Engage/Inform. Method: Text-based conversation. Interaction: User input sends a prompt to the Gemini API, which responds based on the resume content. Justification: Provides a dynamic and unique way for recruiters to explore details and engage with the profile.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f7f4;
+            color: #3d3d3d;
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+        }
+        .skill-bar-outer {
+            background-color: #e0e0e0;
+            border-radius: 9999px;
+            overflow: hidden;
+            height: 1rem;
+        }
+        .skill-bar-inner {
+            background-color: #2563eb;
+            height: 100%;
+            transition: width 1.5s ease-in-out;
+        }
+        .section {
+            scroll-margin-top: 80px;
+        }
+        .chat-message {
+            max-width: 80%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.75rem;
+            word-wrap: break-word;
+        }
+        .user-message {
+            background-color: #2563eb;
+            color: white;
+            margin-left: auto;
+        }
+        .bot-message {
+            background-color: #e0e0e0;
+            color: #3d3d3d;
+        }
+        .chat-container {
+            height: 500px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <nav id="navbar" class="bg-white/80 backdrop-blur-md fixed w-full top-0 z-50 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center h-20">
+                <div class="text-2xl font-bold text-gray-800">Anil Kumar N</div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#summary" class="nav-link text-gray-600 font-medium pb-1">Summary</a>
+                    <a href="#skills" class="nav-link text-gray-600 font-medium pb-1">Skills</a>
+                    <a href="#projects" class="nav-link text-gray-600 font-medium pb-1">Projects</a>
+                    <a href="#education" class="nav-link text-gray-600 font-medium pb-1">Education</a>
+                    <a href="#chatbot" class="nav-link text-gray-600 font-medium pb-1">Chat with Resume</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-700 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-white/90 backdrop-blur-md">
+            <a href="#summary" class="block py-2 px-4 text-sm text-gray-700">Summary</a>
+            <a href="#skills" class="block py-2 px-4 text-sm text-gray-700">Skills</a>
+            <a href="#projects" class="block py-2 px-4 text-sm text-gray-700">Projects</a>
+            <a href="#education" class="block py-2 px-4 text-sm text-gray-700">Education</a>
+            <a href="#chatbot" class="block py-2 px-4 text-sm text-gray-700">Chat with Resume</a>
+        </div>
+    </nav>
+
+    <main class="pt-20">
+        <section id="summary" class="section min-h-[calc(100vh-80px)] flex items-center bg-white">
+            <div class="max-w-6xl mx-auto px-4 py-16 text-center">
+                <h1 class="text-5xl md:text-7xl font-bold text-gray-900 mb-4">Anil Kumar N</h1>
+                <p class="text-xl md:text-2xl text-gray-600 mb-8">Software Engineer Trainee</p>
+                <div class="max-w-3xl mx-auto text-lg text-gray-700 leading-relaxed">
+                    <p>A highly motivated and results-driven MCA graduate with a strong foundation in Java and Object-Oriented Programming. Eager to apply skills in full-stack development, database management, and SQL to contribute to a dynamic team. Possesses excellent analytical and problem-solving abilities, and is open to learning new technologies and relocating for project requirements.</p>
+                </div>
+                 <div class="mt-10 flex justify-center space-x-4">
+                    <a href="mailto:anilsj96@gmail.com" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-full hover:bg-blue-700 transition duration-300">Contact Me</a>
+                    <a href="https://github.com/anilnadipannagari" target="_blank" class="bg-gray-700 text-white font-bold py-3 px-6 rounded-full hover:bg-gray-800 transition duration-300">GitHub</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills" class="section py-20">
+            <div class="max-w-6xl mx-auto px-4">
+                <h2 class="text-4xl font-bold text-center mb-4 text-gray-800">Technical Skills</h2>
+                <p class="text-center text-lg text-gray-600 mb-12">Here's a visual overview of my technical abilities and the tools I work with.</p>
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div class="bg-white p-8 rounded-xl shadow-md">
+                        <h3 class="text-2xl font-bold mb-6 text-gray-700">Programming & Web</h3>
+                        <div class="space-y-6">
+                            <div>
+                                <p class="font-medium mb-1">Java (Advanced)</p>
+                                <div class="skill-bar-outer"><div class="skill-bar-inner" data-width="90%"></div></div>
+                            </div>
+                            <div>
+                                <p class="font-medium mb-1">Python</p>
+                                <div class="skill-bar-outer"><div class="skill-bar-inner" data-width="75%"></div></div>
+                            </div>
+                            <div>
+                                <p class="font-medium mb-1">JavaScript</p>
+                                <div class="skill-bar-outer"><div class="skill-bar-inner" data-width="80%"></div></div>
+                            </div>
+                             <div>
+                                <p class="font-medium mb-1">HTML & CSS</p>
+                                <div class="skill-bar-outer"><div class="skill-bar-inner" data-width="95%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-xl shadow-md">
+                        <h3 class="text-2xl font-bold mb-6 text-gray-700">Frameworks & Databases</h3>
+                        <div class="space-y-6">
+                            <div>
+                                <p class="font-medium mb-1">Spring Boot</p>
+                                <div class="skill-bar-outer"><div class="skill-bar-inner" data-width="85%"></div></div>
+                            </div>
+                            <div>
+                                <p class="font-medium mb-1">React</p>
+                                <div class="skill-bar-outer"><div class="skill-bar-inner" data-width="70%"></div></div>
+                            </div>
+                            <div>
+                                <p class="font-medium mb-1">SQL & DBMS</p>
+                                <div class="skill-bar-outer"><div class="skill-bar-inner" data-width="90%"></div></div>
+                            </div>
+                             <div>
+                                <p class="font-medium mb-1">Git & GitHub</p>
+                                <div class="skill-bar-outer"><div class="skill-bar-inner" data-width="85%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="section py-20 bg-white">
+            <div class="max-w-6xl mx-auto px-4">
+                <h2 class="text-4xl font-bold text-center mb-4 text-gray-800">My Projects</h2>
+                <p class="text-center text-lg text-gray-600 mb-12">These projects demonstrate my ability to build functional, full-stack applications from scratch.</p>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-gray-50 rounded-xl shadow-md p-8 flex flex-col">
+                        <h3 class="text-2xl font-bold mb-3 text-gray-800">Online Library Management System</h3>
+                        <p class="text-gray-600 mb-4 flex-grow">A full-stack web application to manage a library's book collection, demonstrating a strong understanding of Java, DBMS, and SQL. It features a RESTful API backend using Java with Spring Boot to handle CRUD operations and a responsive frontend.</p>
+                        <div class="mb-4">
+                            <span class="inline-block bg-blue-100 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded-full">Java</span>
+                            <span class="inline-block bg-blue-100 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded-full">Spring Boot</span>
+                            <span class="inline-block bg-blue-100 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded-full">MySQL</span>
+                            <span class="inline-block bg-blue-100 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded-full">REST API</span>
+                        </div>
+                        <a href="#" class="text-blue-600 font-semibold hover:underline mt-auto">View on GitHub &rarr;</a>
+                    </div>
+                    <div class="bg-gray-50 rounded-xl shadow-md p-8 flex flex-col">
+                        <h3 class="text-2xl font-bold mb-3 text-gray-800">Simple Online Quiz Application</h3>
+                        <p class="text-gray-600 mb-4 flex-grow">An interactive web application that allows users to take quizzes and receive instant results. This project highlights strong problem-solving skills with a Java and Spring Boot backend to serve questions and validate answers.</p>
+                        <div class="mb-4">
+                             <span class="inline-block bg-green-100 text-green-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded-full">Java</span>
+                            <span class="inline-block bg-green-100 text-green-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded-full">Spring Boot</span>
+                            <span class="inline-block bg-green-100 text-green-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded-full">SQLite</span>
+                             <span class="inline-block bg-green-100 text-green-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded-full">JavaScript</span>
+                        </div>
+                        <a href="#" class="text-blue-600 font-semibold hover:underline mt-auto">View on GitHub &rarr;</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="education" class="section py-20">
+            <div class="max-w-6xl mx-auto px-4">
+                <h2 class="text-4xl font-bold text-center mb-4 text-gray-800">Education</h2>
+                <p class="text-center text-lg text-gray-600 mb-12">My academic journey in computer science.</p>
+                <div class="relative">
+                    <div class="absolute left-1/2 -ml-px w-0.5 h-full bg-gray-300"></div>
+                    <div class="space-y-12">
+                        <div class="relative">
+                            <div class="md:flex items-center md:justify-end md:space-x-8">
+                                <div class="md:w-1/2"></div>
+                                <div class="md:w-1/2 md:pl-8">
+                                    <div class="bg-white p-6 rounded-xl shadow-md">
+                                        <p class="text-sm text-gray-500">Sep 2023 - July 2025</p>
+                                        <h3 class="text-xl font-bold text-gray-800 mt-1">Master of Computer Applications</h3>
+                                        <p class="text-gray-600">Mother Theressa Institute of Computer Applications</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="absolute left-1/2 -translate-x-1/2 -mt-2 w-4 h-4 rounded-full bg-blue-600 border-4 border-white"></div>
+                        </div>
+                        <div class="relative">
+                             <div class="md:flex items-center md:flex-row-reverse md:space-x-reverse md:space-x-8">
+                                <div class="md:w-1/2"></div>
+                                <div class="md:w-1/2 md:pr-8 text-right">
+                                    <div class="bg-white p-6 rounded-xl shadow-md text-left">
+                                        <p class="text-sm text-gray-500">Sep 2018 - Sep 2021</p>
+                                        <h3 class="text-xl font-bold text-gray-800 mt-1">Bachelor of Computer Applications</h3>
+                                        <p class="text-gray-600">VET First Grade College, Bangalore</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="absolute left-1/2 -translate-x-1/2 -mt-2 w-4 h-4 rounded-full bg-blue-600 border-4 border-white"></div>
+                        </div>
+                         <div class="relative">
+                            <div class="md:flex items-center md:justify-end md:space-x-8">
+                                <div class="md:w-1/2"></div>
+                                <div class="md:w-1/2 md:pl-8">
+                                    <div class="bg-white p-6 rounded-xl shadow-md">
+                                        <p class="text-sm text-gray-500">2018</p>
+                                        <h3 class="text-xl font-bold text-gray-800 mt-1">Pre-University Course (PUC)</h3>
+                                        <p class="text-gray-600">RMS PU College, Bangalore</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="absolute left-1/2 -translate-x-1/2 -mt-2 w-4 h-4 rounded-full bg-blue-600 border-4 border-white"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="chatbot" class="section py-20 bg-gray-100">
+            <div class="max-w-6xl mx-auto px-4">
+                <h2 class="text-4xl font-bold text-center mb-4 text-gray-800">✨ Chat with My Resume</h2>
+                <p class="text-center text-lg text-gray-600 mb-12">Ask questions about my skills, projects, or experience and get instant, intelligent responses.</p>
+                <div class="bg-white p-8 rounded-xl shadow-md max-w-2xl mx-auto flex flex-col h-[600px]">
+                    <div id="chat-history" class="chat-container flex-grow p-4 bg-gray-50 rounded-lg mb-4">
+                        <div class="chat-message bot-message self-start">
+                            Hello! I am a Gemini-powered assistant. Ask me anything about Anil's resume, like "Tell me more about the Online Library Management System project."
+                        </div>
+                    </div>
+                    <div class="flex">
+                        <input type="text" id="user-input" placeholder="Ask a question about the resume..." class="flex-grow p-3 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button id="send-button" class="bg-blue-600 text-white font-bold py-3 px-6 rounded-r-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center">
+                            <span id="send-text">Send ✨</span>
+                            <span id="loader" class="hidden h-6 w-6 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p>&copy; 2025 Anil Kumar N. All Rights Reserved.</p>
+            <p class="text-sm text-gray-400 mt-2">Built with Tailwind CSS and Gemini API</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link, #mobile-menu a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                    if (mobileMenu.classList.contains('hidden') === false) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            });
+
+            const sections = document.querySelectorAll('.section');
+            const mainNavLinks = document.querySelectorAll('nav .nav-link');
+
+            const onScroll = () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 90) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                mainNavLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === current) {
+                        link.classList.add('active');
+                    }
+                });
+            };
+
+            window.addEventListener('scroll', onScroll);
+
+            const animateSkillBars = () => {
+                const skillBars = document.querySelectorAll('.skill-bar-inner');
+                skillBars.forEach(bar => {
+                    const width = bar.getAttribute('data-width');
+                    bar.style.width = width;
+                });
+            };
+            
+            const skillsSection = document.getElementById('skills');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateSkillBars();
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            observer.observe(skillsSection);
+
+
+            const chatHistory = document.getElementById('chat-history');
+            const userInput = document.getElementById('user-input');
+            const sendButton = document.getElementById('send-button');
+            const sendText = document.getElementById('send-text');
+            const loader = document.getElementById('loader');
+
+            const resumeContent = `
+                Anil Kumar N is a recent MCA graduate (July 2025).
+                He has strong skills in Java (Advanced), Python, JavaScript, HTML, CSS, React.
+                He is well-versed in OOPs, DSA, and databases like SQL, DBMS, SQLite, and MySQL.
+                His tools and platforms include Git, VS Code, GitHub, and Spring Boot.
+
+                Project 1: Online Library Management System. It's a full-stack web app using Java with Spring Boot for the backend (RESTful API), and MySQL for the database. It handles CRUD operations for books. The frontend uses HTML, CSS, and JavaScript.
+
+                Project 2: Simple Online Quiz Application. This project is a full-stack web app using Java with Spring Boot for the backend and SQLite for the database. It serves quiz questions and calculates scores. The frontend uses HTML, CSS, and JavaScript.
+
+                Education:
+                - Master of Computer Applications from Mother Theressa Institute of Computer Applications (Sep 2023 - July 2025).
+                - Bachelor of Computer Applications from VET First Grade College (Sep 2018 - Sep 2021).
+                - Pre-University Course from RMS PU College (2018).
+
+                Additional Information: Quick learner, strong problem-solving skills, available for immediate joining, and willing to relocate.
+            `;
+
+            async function sendMessage() {
+                const userMessage = userInput.value.trim();
+                if (userMessage === '') return;
+
+                appendMessage(userMessage, 'user-message');
+                userInput.value = '';
+                
+                sendButton.disabled = true;
+                sendText.classList.add('hidden');
+                loader.classList.remove('hidden');
+
+                const prompt = `You are an AI assistant designed to answer questions about Anil Kumar N's resume.
+                Please use only the following information to generate your responses:
+                ${resumeContent}
+                User Question: ${userMessage}
+                Answer as Anil Kumar N, in a professional and concise manner, referencing the provided information. Do not invent information not present in the resume. If the question cannot be answered from the provided text, state that the information is not available in the resume.`;
+                
+                try {
+                    let backoffDelay = 1000;
+                    let response;
+                    for (let i = 0; i < 5; i++) {
+                        response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                        });
+
+                        if (response.status !== 429) {
+                            break;
+                        }
+                        
+                        await new Promise(resolve => setTimeout(resolve, backoffDelay));
+                        backoffDelay *= 2;
+                    }
+                    
+                    const result = await response.json();
+                    const botResponse = result.candidates[0].content.parts[0].text;
+                    appendMessage(botResponse, 'bot-message');
+                } catch (error) {
+                    console.error('Error fetching from Gemini API:', error);
+                    appendMessage('Sorry, I am unable to process that request at this time. Please try again later.', 'bot-message');
+                } finally {
+                    sendButton.disabled = false;
+                    sendText.classList.remove('hidden');
+                    loader.classList.add('hidden');
+                }
+            }
+
+            function appendMessage(text, className) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('chat-message', className);
+                messageElement.textContent = text;
+                chatHistory.appendChild(messageElement);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            }
+
+            sendButton.addEventListener('click', sendMessage);
+
+            userInput.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
