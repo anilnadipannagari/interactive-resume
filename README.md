@@ -1,4 +1,4 @@
-Anil Kumar N - Interactive Resume
+Anil Kumar - Interactive Resume
 This is an interactive single-page web application (SPA) that serves as my digital resume. The purpose of this project is to provide a modern, engaging, and dynamic way for recruiters and hiring managers to explore my skills, projects, and educational background. A key feature is a Gemini-powered chatbot that allows users to ask questions about my resume content and get instant, intelligent responses.
 
 Key Features
