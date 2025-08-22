@@ -1,0 +1,63 @@
+💻 Programming Languages
+
+Java (Core Java, OOPs, Collections, Basic DSA, Graphs)
+
+Python (Basics, Random Forest, Data Analysis)
+
+JavaScript (Core JS, DOM Manipulation)
+
+VB.Net (mini-projects)
+
+SQL
+
+🌐 Web Development
+
+HTML5
+
+CSS3
+
+Bootstrap
+
+JavaScript (ES6)
+
+React.js (currently learning via IBM Front-End Developer course)
+
+⚙️ Frameworks & Backend
+
+Django (Student Database Project)
+
+Spring & Spring Boot (learning path for backend projects & microservices)
+
+🗄️ Databases
+
+SQLite3
+
+MySQL
+
+NoSQL (basics, as advised for interview prep)
+
+🛠️ Tools & Version Control
+
+Git & GitHub (version control, project hosting)
+
+Eclipse, VS Code, IntelliJ IDEA
+
+Microsoft Excel, Word, PowerPoint
+
+📊 Data & Analytics
+
+Basics of Data Science
+
+Data Visualization in Excel
+
+Stock Market Prediction using ML (Random Forest)
+
+🎓 Certifications
+
+Microsoft Excel
+
+Basics of Data Science
+
+Essential Excel Skills for Business (Macquarie University)
+
+Google Data Foundations (Google)
